@@ -1,4 +1,4 @@
-import { motion, useAnimation } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Lottie from 'lottie-react';
 import welcomeAnim from '../assets/animations/wedding.json';
 import ceremonyAnim from '../assets/animations/ceremony.json';
