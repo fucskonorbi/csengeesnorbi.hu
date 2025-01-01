@@ -72,7 +72,7 @@ const RsvpForm = () => {
                 name="name"
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                placeholder="Név"
+                placeholder="Teljes név"
               />
               <ValidationError prefix="Name" field="name" errors={state.errors} className="text-red-500 mt-1" />
             </div>
