@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion';
 import { Person, Phone, Celebration, Restaurant, Message, ChildCare } from '@mui/icons-material';
 import { useState } from 'react';
+import confetti from 'canvas-confetti';
 
 interface FormData {
   name: string;
   phone: string;
   guestNames?: string;
   childrenCount?: {
-    between3And12: number;
-    under3: number;
+    between3And12: number | null;
+    under3: number | null;
   };
   dietaryRequirements?: string;
   message?: string;
@@ -24,8 +25,8 @@ const RsvpForm = () => {
     phone: '',
     guestNames: '',
     childrenCount: {
-      between3And12: 0,
-      under3: 0
+      between3And12: null,
+      under3: null
     },
     dietaryRequirements: '',
     message: ''
@@ -50,6 +51,16 @@ const RsvpForm = () => {
   }
 
   const handleInputChange = (field: keyof FormData, value: any) => {
+    if (field === 'childrenCount') {
+      // Handle empty string for number inputs
+      if (value.between3And12 === '') value.between3And12 = null;
+      if (value.under3 === '') value.under3 = null;
+      
+      // Convert string numbers to actual numbers
+      if (typeof value.between3And12 === 'string') value.between3And12 = parseInt(value.between3And12) || null;
+      if (typeof value.under3 === 'string') value.under3 = parseInt(value.under3) || null;
+    }
+    
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -61,9 +72,16 @@ const RsvpForm = () => {
     setIsSubmitting(true);
     setError(null);
 
+    // Convert null values to 0 for submission
+    const childrenCount = {
+      between3And12: formData.childrenCount?.between3And12 ?? 0,
+      under3: formData.childrenCount?.under3 ?? 0
+    };
+
     try {
       console.log('Submitting form data:', {
         ...formData,
+        childrenCount,
         attendance: isAttending ? 'Igen' : 'Nem'
       });
 
@@ -79,8 +97,8 @@ const RsvpForm = () => {
           phone: formData.phone,
           attendance: isAttending ? 'Igen' : 'Nem',
           guestNames: formData.guestNames || 'Nem megadott',
-          childrenBetween3And12: formData.childrenCount?.between3And12 || 0,
-          childrenUnder3: formData.childrenCount?.under3 || 0,
+          childrenBetween3And12: childrenCount.between3And12,
+          childrenUnder3: childrenCount.under3,
           dietaryRequirements: formData.dietaryRequirements || 'Nincs',
           message: formData.message || 'Nincs üzenet',
           _subject: 'Új RSVP visszajelzés érkezett!',
@@ -95,6 +113,47 @@ const RsvpForm = () => {
 
       if (data.success) {
         setIsSubmitted(true);
+        // Trigger confetti
+        const count = 200;
+        const defaults = {
+          origin: { y: 0.7 },
+          zIndex: 1000
+        };
+
+        function fire(particleRatio: number, opts: confetti.Options) {
+          confetti({
+            ...defaults,
+            ...opts,
+            particleCount: Math.floor(count * particleRatio),
+          });
+        }
+
+        fire(0.25, {
+          spread: 26,
+          startVelocity: 55,
+        });
+
+        fire(0.2, {
+          spread: 60,
+        });
+
+        fire(0.35, {
+          spread: 100,
+          decay: 0.91,
+          scalar: 0.8
+        });
+
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 25,
+          decay: 0.92,
+          scalar: 1.2
+        });
+
+        fire(0.1, {
+          spread: 120,
+          startVelocity: 45,
+        });
       } else {
         console.error('Form submission failed:', data);
         setError(`Hiba történt a küldés során: ${data.message || 'Ismeretlen hiba'}`);
@@ -175,7 +234,7 @@ const RsvpForm = () => {
             <div className="space-y-3 mx-3">
               <label className="flex items-center space-x-2 text-gray-700">
                 <Celebration className="h-5 w-5 text-primary" />
-                <span>Részt veszel az esküvőn?</span>
+                <span className="font-medium">Részt veszel az esküvőn?*</span>
               </label>
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <button
@@ -183,8 +242,8 @@ const RsvpForm = () => {
                   onClick={() => setIsAttending(true)}
                   className={`p-3 rounded-lg transition-all ${
                     isAttending === true
-                      ? 'bg-primary text-white'
-                      : 'border border-primary-light/20 text-gray-700 hover:bg-primary-light/10'
+                      ? 'bg-primary text-white ring-2 ring-primary ring-offset-2'
+                      : 'border-2 border-primary-light/20 text-gray-700 hover:bg-primary-light/10'
                   }`}
                 >
                   Igen
@@ -194,8 +253,8 @@ const RsvpForm = () => {
                   onClick={() => setIsAttending(false)}
                   className={`p-3 rounded-lg transition-all ${
                     isAttending === false
-                      ? 'bg-primary text-white'
-                      : 'border border-primary-light/20 text-gray-700 hover:bg-primary-light/10'
+                      ? 'bg-primary text-white ring-2 ring-primary ring-offset-2'
+                      : 'border-2 border-primary-light/20 text-gray-700 hover:bg-primary-light/10'
                   }`}
                 >
                   Sajnos nem
@@ -236,10 +295,10 @@ const RsvpForm = () => {
                         <input
                           type="number"
                           min="0"
-                          value={formData.childrenCount?.between3And12}
+                          value={formData.childrenCount?.between3And12 ?? ''}
                           onChange={(e) => handleInputChange('childrenCount', {
                             ...formData.childrenCount,
-                            between3And12: parseInt(e.target.value) || 0
+                            between3And12: e.target.value
                           })}
                           className="block w-full px-3 py-2 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
                           placeholder="0"
@@ -254,10 +313,10 @@ const RsvpForm = () => {
                         <input
                           type="number"
                           min="0"
-                          value={formData.childrenCount?.under3}
+                          value={formData.childrenCount?.under3 ?? ''}
                           onChange={(e) => handleInputChange('childrenCount', {
                             ...formData.childrenCount,
-                            under3: parseInt(e.target.value) || 0
+                            under3: e.target.value
                           })}
                           className="block w-full px-3 py-2 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
                           placeholder="0"
@@ -297,15 +356,17 @@ const RsvpForm = () => {
               />
             </div>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isSubmitting || isAttending === null}
-              className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? "Küldés..." : "Küldés"}
-            </motion.button>
+            <div className="space-y-4">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="submit"
+                disabled={isSubmitting || isAttending === null}
+                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Küldés..." : "Küldés"}
+              </motion.button>
+            </div>
           </motion.form>
         </div>
       </div>
