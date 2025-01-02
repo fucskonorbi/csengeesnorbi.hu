@@ -1,13 +1,22 @@
 import { motion } from 'framer-motion';
-import { useForm, ValidationError } from '@formspree/react';
-import { Person, Phone, Celebration, Restaurant, Message } from '@mui/icons-material';
+import { Person, Phone, Celebration, Restaurant, Message, ChildCare } from '@mui/icons-material';
 import { useState } from 'react';
 
-const RsvpForm = () => {
-  const [state, handleSubmit] = useForm("YOUR_FORMSPREE_FORM_ID");
-  const [isAttending, setIsAttending] = useState<boolean | null>(null);
+interface GuestFields {
+  name: string;
+  dietary: string;
+  ageGroup: 'adult' | 'under12' | 'under3';
+}
 
-  if (state.succeeded) {
+const RsvpForm = () => {
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isAttending, setIsAttending] = useState<boolean | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [guestCount, setGuestCount] = useState<number>(1);
+  const [guests, setGuests] = useState<GuestFields[]>([{ name: '', dietary: '', ageGroup: 'adult' }]);
+
+  if (isSubmitted) {
     return (
       <div className="relative w-full bg-white py-20">
         <motion.div
@@ -30,6 +39,67 @@ const RsvpForm = () => {
 
   const handleAttendanceChange = (value: boolean) => {
     setIsAttending(value);
+    if (!value) {
+      setGuestCount(1);
+      setGuests([{ name: '', dietary: '', ageGroup: 'adult' }]);
+    }
+  };
+
+  const handleGuestCountChange = (count: number) => {
+    setGuestCount(count);
+    if (count > guests.length) {
+      setGuests([...guests, ...Array(count - guests.length).fill({ name: '', dietary: '', ageGroup: 'adult' })]);
+    } else {
+      setGuests(guests.slice(0, count));
+    }
+  };
+
+  const handleGuestChange = (index: number, field: keyof GuestFields, value: string) => {
+    const newGuests = [...guests];
+    newGuests[index] = { ...newGuests[index], [field]: value };
+    setGuests(newGuests);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const contactInfo = {
+      contact_phone: formData.get('phone'),
+      attendance: isAttending ? 'Igen' : 'Nem',
+      message: formData.get('message'),
+    };
+
+    try {
+      const response = await fetch('https://formsubmit.co/ajax/fucskonorbi@gmail.com', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          ...contactInfo,
+          guests: guests,
+          _subject: 'Új RSVP visszajelzés érkezett!',
+          _cc: 'csengeszathmari@gmail.com',
+          _template: 'table'
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSubmitted(true);
+      } else {
+        setError('Hiba történt a küldés során. Kérjük, próbáld újra később.');
+      }
+    } catch (err) {
+      setError('Hiba történt a küldés során. Kérjük, próbáld újra később.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -61,21 +131,11 @@ const RsvpForm = () => {
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl shadow-lg p-8 md:p-12 space-y-8"
           >
-            {/* Name Input */}
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Person className="h-5 w-5 text-primary" />
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+                {error}
               </div>
-              <input
-                id="name"
-                type="text"
-                name="name"
-                required
-                className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                placeholder="Teljes név"
-              />
-              <ValidationError prefix="Name" field="name" errors={state.errors} className="text-red-500 mt-1" />
-            </div>
+            )}
 
             {/* Phone Input */}
             <div className="relative">
@@ -90,7 +150,6 @@ const RsvpForm = () => {
                 className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                 placeholder="Telefonszám"
               />
-              <ValidationError prefix="Phone" field="phone" errors={state.errors} className="text-red-500 mt-1" />
             </div>
 
             {/* Attendance Radio */}
@@ -123,7 +182,6 @@ const RsvpForm = () => {
                   Sajnos nem
                 </button>
               </div>
-              <input type="hidden" name="attendance" value={isAttending ? 'yes' : 'no'} />
             </div>
 
             {/* Conditional fields based on attendance */}
@@ -140,24 +198,89 @@ const RsvpForm = () => {
                     name="guests"
                     min="1"
                     max="10"
+                    value={guestCount}
+                    onChange={(e) => handleGuestCountChange(Math.max(1, parseInt(e.target.value) || 1))}
                     required
                     className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                     placeholder="Hány fővel érkezel?"
                   />
                 </div>
 
-                {/* Dietary Requirements */}
-                <div className="relative">
-                  <div className="absolute top-3 left-3">
-                    <Restaurant className="h-5 w-5 text-primary" />
-                  </div>
-                  <textarea
-                    id="dietary"
-                    name="dietary"
-                    rows={3}
-                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                    placeholder="Ételérzékenység/speciális étrend"
-                  />
+                {/* Guest Details */}
+                <div className="space-y-8">
+                  {guests.map((guest, index) => (
+                    <div key={index} className="space-y-4 p-6 border border-primary-light/20 rounded-lg">
+                      <h4 className="font-semibold text-lg text-primary-dark">
+                        {index + 1}. vendég adatai
+                      </h4>
+                      
+                      {/* Guest Name */}
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <Person className="h-5 w-5 text-primary" />
+                        </div>
+                        <input
+                          type="text"
+                          value={guest.name}
+                          onChange={(e) => handleGuestChange(index, 'name', e.target.value)}
+                          required
+                          className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                          placeholder="Vendég neve"
+                        />
+                      </div>
+
+                      {/* Guest Dietary Requirements */}
+                      <div className="relative">
+                        <div className="absolute top-3 left-3">
+                          <Restaurant className="h-5 w-5 text-primary" />
+                        </div>
+                        <textarea
+                          value={guest.dietary}
+                          onChange={(e) => handleGuestChange(index, 'dietary', e.target.value)}
+                          rows={2}
+                          className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                          placeholder="Ételérzékenység/speciális étrend (ha van)"
+                        />
+                      </div>
+
+                      {/* Age Group */}
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <ChildCare className="h-5 w-5 text-primary" />
+                          <span className="text-sm text-gray-600">Életkor</span>
+                        </div>
+                        <div className="flex space-x-4">
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              checked={guest.ageGroup === 'adult'}
+                              onChange={() => handleGuestChange(index, 'ageGroup', 'adult')}
+                              className="text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm">12+ év</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              checked={guest.ageGroup === 'under12'}
+                              onChange={() => handleGuestChange(index, 'ageGroup', 'under12')}
+                              className="text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm">4-12 év</span>
+                          </label>
+                          <label className="flex items-center space-x-2">
+                            <input
+                              type="radio"
+                              checked={guest.ageGroup === 'under3'}
+                              onChange={() => handleGuestChange(index, 'ageGroup', 'under3')}
+                              className="text-primary focus:ring-primary"
+                            />
+                            <span className="text-sm">0-3 év</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </>
             )}
@@ -180,10 +303,10 @@ const RsvpForm = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              disabled={state.submitting || isAttending === null}
+              disabled={isSubmitting || isAttending === null}
               className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {state.submitting ? "Küldés..." : "Küldés"}
+              {isSubmitting ? "Küldés..." : "Küldés"}
             </motion.button>
           </motion.form>
         </div>
