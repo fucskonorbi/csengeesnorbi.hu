@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Person, Phone, Celebration, Restaurant, Message, ChildCare } from '@mui/icons-material';
 import { useState } from 'react';
 import confetti from 'canvas-confetti';
-import { CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import { CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 
 interface FormData {
   name: string;
