@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const navItems = [
   { id: 'home', label: 'Kezdőlap' },
@@ -10,6 +10,7 @@ const navItems = [
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +20,11 @@ const Navigation = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Close mobile menu when clicking a link
+  const handleMobileNavClick = () => {
+    setIsMobileMenuOpen(false);
+  };
 
   return (
     <motion.header
@@ -50,7 +56,11 @@ const Navigation = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden">
-            <button className="text-gray-800 hover:text-primary">
+            <button 
+              className="text-gray-800 hover:text-primary"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
               <svg
                 className="h-6 w-6"
                 fill="none"
@@ -60,12 +70,42 @@ const Navigation = () => {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path d="M4 6h16M4 12h16M4 18h16" />
+                {isMobileMenuOpen ? (
+                  <path d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                )}
               </svg>
             </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg"
+          >
+            <nav className="px-4 py-2">
+              {navItems.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="block py-3 text-gray-800 hover:text-primary transition-colors duration-200 font-display text-lg border-b border-gray-100 last:border-none"
+                  onClick={handleMobileNavClick}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Decorative elements */}
       <div className="absolute top-0 left-0 w-32 h-32 bg-floral-pattern opacity-20 -z-10" />

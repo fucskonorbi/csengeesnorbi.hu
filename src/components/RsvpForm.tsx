@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { Person, Phone, Celebration, Restaurant, Message, ChildCare } from '@mui/icons-material';
 import { useState } from 'react';
 import confetti from 'canvas-confetti';
+import { CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 
 interface FormData {
   name: string;
@@ -20,6 +21,7 @@ const RsvpForm = () => {
   const [isAttending, setIsAttending] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     phone: '',
@@ -71,6 +73,7 @@ const RsvpForm = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
+    setIsErrorDialogOpen(false);
 
     // Convert null values to 0 for submission
     const childrenCount = {
@@ -157,10 +160,12 @@ const RsvpForm = () => {
       } else {
         console.error('Form submission failed:', data);
         setError(`Hiba történt a küldés során: ${data.message || 'Ismeretlen hiba'}`);
+        setIsErrorDialogOpen(true);
       }
     } catch (err) {
       console.error('Form submission error:', err);
       setError(`Hiba történt a küldés során: ${err instanceof Error ? err.message : 'Ismeretlen hiba'}`);
+      setIsErrorDialogOpen(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -170,6 +175,38 @@ const RsvpForm = () => {
     <div className="relative w-full bg-secondary-light/20 py-20">
       <div className="absolute top-0 left-0 w-64 h-64 bg-floral-pattern opacity-5 transform -rotate-12" />
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-floral-pattern opacity-5 transform rotate-12" />
+
+      <Dialog
+        open={isErrorDialogOpen}
+        onClose={() => setIsErrorDialogOpen(false)}
+        aria-labelledby="error-dialog-title"
+      >
+        <DialogTitle id="error-dialog-title">
+          Hiba történt a küldés során
+        </DialogTitle>
+        <DialogContent>
+          <p className="mb-4">Sajnáljuk, de hiba történt a visszajelzés küldése során. Kérjük, próbáld meg kitölteni a Google Form-ot helyette:</p>
+          <p>{error}</p>
+        </DialogContent>
+        <DialogActions>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setIsErrorDialogOpen(false)}
+            className="border-2 border-primary text-primary hover:bg-primary/10 font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            Bezárás
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => window.open('https://forms.gle/S47HpstzzxWU2EHD6', '_blank')}
+            className="bg-primary hover:bg-primary-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          >
+            Google Form megnyitása
+          </motion.button>
+        </DialogActions>
+      </Dialog>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
@@ -273,7 +310,6 @@ const RsvpForm = () => {
                   <textarea
                     value={formData.guestNames}
                     onChange={(e) => handleInputChange('guestNames', e.target.value)}
-                    required
                     rows={3}
                     className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                     placeholder="Kérlek sorold fel az érkezők teljes nevét"
@@ -362,9 +398,13 @@ const RsvpForm = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={isSubmitting || isAttending === null}
-                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-primary hover:bg-primary-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {isSubmitting ? "Küldés..." : "Küldés"}
+                {isSubmitting ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Küldés"
+                )}
               </motion.button>
             </div>
           </motion.form>

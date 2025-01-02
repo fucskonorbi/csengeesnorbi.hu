@@ -62,29 +62,29 @@ const Hero = () => {
             <Countdown
               date={weddingDate}
               renderer={({ days, hours, minutes, seconds }) => (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-4 gap-2 sm:gap-4">
                   <div className="text-center">
-                    <div className="bg-primary-light/20 rounded-lg p-3">
-                      <span className="block text-3xl md:text-4xl font-bold text-primary-dark mb-1">{days}</span>
-                      <span className="text-sm text-gray-600">nap</span>
+                    <div className="bg-primary-light/20 rounded-lg p-2 sm:p-3">
+                      <span className="block text-2xl sm:text-3xl md:text-4xl font-bold text-primary-dark mb-0.5 sm:mb-1">{days}</span>
+                      <span className="text-xs sm:text-sm text-gray-600">nap</span>
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="bg-primary-light/20 rounded-lg p-3">
-                      <span className="block text-3xl md:text-4xl font-bold text-primary-dark mb-1">{hours}</span>
-                      <span className="text-sm text-gray-600">óra</span>
+                    <div className="bg-primary-light/20 rounded-lg p-2 sm:p-3">
+                      <span className="block text-2xl sm:text-3xl md:text-4xl font-bold text-primary-dark mb-0.5 sm:mb-1">{hours}</span>
+                      <span className="text-xs sm:text-sm text-gray-600">óra</span>
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="bg-primary-light/20 rounded-lg p-3">
-                      <span className="block text-3xl md:text-4xl font-bold text-primary-dark mb-1">{minutes}</span>
-                      <span className="text-sm text-gray-600">perc</span>
+                    <div className="bg-primary-light/20 rounded-lg p-2 sm:p-3">
+                      <span className="block text-2xl sm:text-3xl md:text-4xl font-bold text-primary-dark mb-0.5 sm:mb-1">{minutes}</span>
+                      <span className="text-xs sm:text-sm text-gray-600">perc</span>
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="bg-primary-light/20 rounded-lg p-3">
-                      <span className="block text-3xl md:text-4xl font-bold text-primary-dark mb-1">{seconds}</span>
-                      <span className="text-sm text-gray-600">mp</span>
+                    <div className="bg-primary-light/20 rounded-lg p-2 sm:p-3">
+                      <span className="block text-2xl sm:text-3xl md:text-4xl font-bold text-primary-dark mb-0.5 sm:mb-1">{seconds}</span>
+                      <span className="text-xs sm:text-sm text-gray-600">mp</span>
                     </div>
                   </div>
                 </div>
