@@ -2,10 +2,16 @@ import { motion } from 'framer-motion';
 import { Person, Phone, Celebration, Restaurant, Message, ChildCare } from '@mui/icons-material';
 import { useState } from 'react';
 
-interface GuestFields {
+interface FormData {
   name: string;
-  dietary: string;
-  ageGroup: 'adult' | 'under12' | 'under3';
+  phone: string;
+  guestNames?: string;
+  childrenCount?: {
+    between3And12: number;
+    under3: number;
+  };
+  dietaryRequirements?: string;
+  message?: string;
 }
 
 const RsvpForm = () => {
@@ -13,8 +19,17 @@ const RsvpForm = () => {
   const [isAttending, setIsAttending] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [guestCount, setGuestCount] = useState<number>(1);
-  const [guests, setGuests] = useState<GuestFields[]>([{ name: '', dietary: '', ageGroup: 'adult' }]);
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    phone: '',
+    guestNames: '',
+    childrenCount: {
+      between3And12: 0,
+      under3: 0
+    },
+    dietaryRequirements: '',
+    message: ''
+  });
 
   if (isSubmitted) {
     return (
@@ -28,36 +43,17 @@ const RsvpForm = () => {
             <h3 className="font-display text-2xl text-primary-dark mb-4">
               Köszönjük a visszajelzést!
             </h3>
-            <p className="text-gray-600">
-              Hamarosan felvesszük veled a kapcsolatot.
-            </p>
           </div>
         </motion.div>
       </div>
     );
   }
 
-  const handleAttendanceChange = (value: boolean) => {
-    setIsAttending(value);
-    if (!value) {
-      setGuestCount(1);
-      setGuests([{ name: '', dietary: '', ageGroup: 'adult' }]);
-    }
-  };
-
-  const handleGuestCountChange = (count: number) => {
-    setGuestCount(count);
-    if (count > guests.length) {
-      setGuests([...guests, ...Array(count - guests.length).fill({ name: '', dietary: '', ageGroup: 'adult' })]);
-    } else {
-      setGuests(guests.slice(0, count));
-    }
-  };
-
-  const handleGuestChange = (index: number, field: keyof GuestFields, value: string) => {
-    const newGuests = [...guests];
-    newGuests[index] = { ...newGuests[index], [field]: value };
-    setGuests(newGuests);
+  const handleInputChange = (field: keyof FormData, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -65,38 +61,47 @@ const RsvpForm = () => {
     setIsSubmitting(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
-    const contactInfo = {
-      contact_phone: formData.get('phone'),
-      attendance: isAttending ? 'Igen' : 'Nem',
-      message: formData.get('message'),
-    };
-
     try {
+      console.log('Submitting form data:', {
+        ...formData,
+        attendance: isAttending ? 'Igen' : 'Nem'
+      });
+
       const response = await fetch('https://formsubmit.co/ajax/fucskonorbi@gmail.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json'
+          'Accept': 'application/json',
+          'Origin': window.location.origin
         },
         body: JSON.stringify({
-          ...contactInfo,
-          guests: guests,
+          name: formData.name,
+          phone: formData.phone,
+          attendance: isAttending ? 'Igen' : 'Nem',
+          guestNames: formData.guestNames || 'Nem megadott',
+          childrenBetween3And12: formData.childrenCount?.between3And12 || 0,
+          childrenUnder3: formData.childrenCount?.under3 || 0,
+          dietaryRequirements: formData.dietaryRequirements || 'Nincs',
+          message: formData.message || 'Nincs üzenet',
           _subject: 'Új RSVP visszajelzés érkezett!',
           _cc: 'csengeszathmari@gmail.com',
-          _template: 'table'
+          _template: 'table',
+          _captcha: 'false'
         })
       });
 
       const data = await response.json();
+      console.log('Server response:', data);
 
       if (data.success) {
         setIsSubmitted(true);
       } else {
-        setError('Hiba történt a küldés során. Kérjük, próbáld újra később.');
+        console.error('Form submission failed:', data);
+        setError(`Hiba történt a küldés során: ${data.message || 'Ismeretlen hiba'}`);
       }
     } catch (err) {
-      setError('Hiba történt a küldés során. Kérjük, próbáld újra később.');
+      console.error('Form submission error:', err);
+      setError(`Hiba történt a küldés során: ${err instanceof Error ? err.message : 'Ismeretlen hiba'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +109,6 @@ const RsvpForm = () => {
 
   return (
     <div className="relative w-full bg-secondary-light/20 py-20">
-      {/* Background decorations */}
       <div className="absolute top-0 left-0 w-64 h-64 bg-floral-pattern opacity-5 transform -rotate-12" />
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-floral-pattern opacity-5 transform rotate-12" />
 
@@ -137,15 +141,30 @@ const RsvpForm = () => {
               </div>
             )}
 
+            {/* Name Input */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Person className="h-5 w-5 text-primary" />
+              </div>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                required
+                className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                placeholder="Teljes név"
+              />
+            </div>
+
             {/* Phone Input */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Phone className="h-5 w-5 text-primary" />
               </div>
               <input
-                id="phone"
                 type="tel"
-                name="phone"
+                value={formData.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
                 placeholder="Telefonszám"
@@ -153,7 +172,7 @@ const RsvpForm = () => {
             </div>
 
             {/* Attendance Radio */}
-            <div className="space-y-3">
+            <div className="space-y-3 mx-3">
               <label className="flex items-center space-x-2 text-gray-700">
                 <Celebration className="h-5 w-5 text-primary" />
                 <span>Részt veszel az esküvőn?</span>
@@ -161,7 +180,7 @@ const RsvpForm = () => {
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <button
                   type="button"
-                  onClick={() => handleAttendanceChange(true)}
+                  onClick={() => setIsAttending(true)}
                   className={`p-3 rounded-lg transition-all ${
                     isAttending === true
                       ? 'bg-primary text-white'
@@ -172,7 +191,7 @@ const RsvpForm = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleAttendanceChange(false)}
+                  onClick={() => setIsAttending(false)}
                   className={`p-3 rounded-lg transition-all ${
                     isAttending === false
                       ? 'bg-primary text-white'
@@ -187,100 +206,79 @@ const RsvpForm = () => {
             {/* Conditional fields based on attendance */}
             {isAttending && (
               <>
-                {/* Number of Guests */}
+                {/* Guest Names */}
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute top-3 left-3">
                     <Person className="h-5 w-5 text-primary" />
                   </div>
-                  <input
-                    id="guests"
-                    type="number"
-                    name="guests"
-                    min="1"
-                    max="10"
-                    value={guestCount}
-                    onChange={(e) => handleGuestCountChange(Math.max(1, parseInt(e.target.value) || 1))}
+                  <textarea
+                    value={formData.guestNames}
+                    onChange={(e) => handleInputChange('guestNames', e.target.value)}
                     required
+                    rows={3}
                     className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                    placeholder="Hány fővel érkezel?"
+                    placeholder="Kérlek sorold fel az érkezők teljes nevét"
                   />
                 </div>
 
-                {/* Guest Details */}
-                <div className="space-y-8">
-                  {guests.map((guest, index) => (
-                    <div key={index} className="space-y-4 p-6 border border-primary-light/20 rounded-lg">
-                      <h4 className="font-semibold text-lg text-primary-dark">
-                        {index + 1}. vendég adatai
-                      </h4>
-                      
-                      {/* Guest Name */}
+                {/* Children Count */}
+                <div className="space-y-4 mx-3">
+                  <label className="flex items-center space-x-2 text-gray-700">
+                    <ChildCare className="h-5 w-5 text-primary" />
+                    <span>Ezek közül hányan vannak 12 és 3 év között és hányan 3 év alatt?</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        3-12 év között
+                      </label>
                       <div className="relative">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <Person className="h-5 w-5 text-primary" />
-                        </div>
                         <input
-                          type="text"
-                          value={guest.name}
-                          onChange={(e) => handleGuestChange(index, 'name', e.target.value)}
-                          required
-                          className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                          placeholder="Vendég neve"
+                          type="number"
+                          min="0"
+                          value={formData.childrenCount?.between3And12}
+                          onChange={(e) => handleInputChange('childrenCount', {
+                            ...formData.childrenCount,
+                            between3And12: parseInt(e.target.value) || 0
+                          })}
+                          className="block w-full px-3 py-2 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+                          placeholder="0"
                         />
-                      </div>
-
-                      {/* Guest Dietary Requirements */}
-                      <div className="relative">
-                        <div className="absolute top-3 left-3">
-                          <Restaurant className="h-5 w-5 text-primary" />
-                        </div>
-                        <textarea
-                          value={guest.dietary}
-                          onChange={(e) => handleGuestChange(index, 'dietary', e.target.value)}
-                          rows={2}
-                          className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                          placeholder="Ételérzékenység/speciális étrend (ha van)"
-                        />
-                      </div>
-
-                      {/* Age Group */}
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-2">
-                          <ChildCare className="h-5 w-5 text-primary" />
-                          <span className="text-sm text-gray-600">Életkor</span>
-                        </div>
-                        <div className="flex space-x-4">
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="radio"
-                              checked={guest.ageGroup === 'adult'}
-                              onChange={() => handleGuestChange(index, 'ageGroup', 'adult')}
-                              className="text-primary focus:ring-primary"
-                            />
-                            <span className="text-sm">12+ év</span>
-                          </label>
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="radio"
-                              checked={guest.ageGroup === 'under12'}
-                              onChange={() => handleGuestChange(index, 'ageGroup', 'under12')}
-                              className="text-primary focus:ring-primary"
-                            />
-                            <span className="text-sm">4-12 év</span>
-                          </label>
-                          <label className="flex items-center space-x-2">
-                            <input
-                              type="radio"
-                              checked={guest.ageGroup === 'under3'}
-                              onChange={() => handleGuestChange(index, 'ageGroup', 'under3')}
-                              className="text-primary focus:ring-primary"
-                            />
-                            <span className="text-sm">0-3 év</span>
-                          </label>
-                        </div>
                       </div>
                     </div>
-                  ))}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-700">
+                        3 év alatt
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          value={formData.childrenCount?.under3}
+                          onChange={(e) => handleInputChange('childrenCount', {
+                            ...formData.childrenCount,
+                            under3: parseInt(e.target.value) || 0
+                          })}
+                          className="block w-full px-3 py-2 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent"
+                          placeholder="0"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Dietary Requirements */}
+                <div className="relative">
+                  <div className="absolute top-3 left-3">
+                    <Restaurant className="h-5 w-5 text-primary" />
+                  </div>
+                  <textarea
+                    value={formData.dietaryRequirements}
+                    onChange={(e) => handleInputChange('dietaryRequirements', e.target.value)}
+                    rows={3}
+                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                    placeholder="Az érkezőknek van-e bármilyen ételallergiája és/vagy speciális étrendje?"
+                  />
                 </div>
               </>
             )}
@@ -291,11 +289,11 @@ const RsvpForm = () => {
                 <Message className="h-5 w-5 text-primary" />
               </div>
               <textarea
-                id="message"
-                name="message"
+                value={formData.message}
+                onChange={(e) => handleInputChange('message', e.target.value)}
                 rows={4}
                 className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                placeholder="Üzenet a párnak"
+                placeholder="Egyéb üzenet a párnak"
               />
             </div>
 

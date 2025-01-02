@@ -4,7 +4,7 @@ import kintImage from '../assets/kint.jpg';
 import helyImage from '../assets/hely.jpg';
 import teremImage from '../assets/terem.jpg';
 import dekoracioImage from '../assets/dekoracio.jpeg';
-
+const mapSource = `https://www.google.com/maps?q=${encodeURIComponent("Kerekerdő rendezvényház, Debrecen")}&hl=es;z=14&output=embed`;
 const Location = () => {
   return (
     <div className="relative w-full bg-white py-20">
@@ -37,7 +37,7 @@ const Location = () => {
           >
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2693.4762001906844!2d21.6238873!3d47.5291889!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47470e2c8e7f5555%3A0x1f7c7f7f7f7f7f7f!2sKereker%C5%91%20rendezv%C3%A9nyh%C3%A1z!5e0!3m2!1shu!2shu!4v1620000000000!5m2!1shu!2shu"
+                src={mapSource}
                 className="w-full h-[400px]"
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
