@@ -320,7 +320,7 @@ const RsvpForm = () => {
                 <div className="space-y-4 mx-3">
                   <label className="flex items-center space-x-2 text-gray-700">
                     <ChildCare className="h-5 w-5 text-primary" />
-                    <span>Ezek közül hányan vannak 12 és 3 év között és hányan 3 év alatt?</span>
+                    <span>Ezek közül hányan vannak 3 és 12 év között és hányan 3 év alatt?</span>
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">

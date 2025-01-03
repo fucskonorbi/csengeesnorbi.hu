@@ -52,3 +52,4 @@ export default tseslint.config({
 ## TODOs
 
 - [ ] Optimize hero image
+- [ ] Fix scrolling behaviour (there are 2 scrollbars)
