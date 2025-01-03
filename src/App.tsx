@@ -8,7 +8,7 @@ import RsvpForm from './components/RsvpForm';
 function App() {
   return (
     <LazyMotion features={domAnimation}>
-      <div className="w-full min-h-screen overflow-x-hidden">
+      <div className="w-full min-h-screen overflow-x-hidden overflow-y-hidden">
         <Navigation />
         <main className="w-full">
           <motion.div
