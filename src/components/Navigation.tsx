@@ -58,7 +58,7 @@ const Navigation = () => {
           {/* Mobile menu button */}
           <div className="md:hidden">
             <button 
-              className="text-gray-800 hover:text-primary"
+              className="text-white hover:text-primary"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle menu"
             >
@@ -108,9 +108,9 @@ const Navigation = () => {
         )}
       </AnimatePresence>
 
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-32 h-32 bg-floral-pattern opacity-20 -z-10" />
-      <div className="absolute top-0 right-0 w-32 h-32 bg-floral-pattern opacity-20 -z-10 transform scale-x-[-1]" />
+      {/* Decorative elements
+      <div className="absolute top-0 left-0 w-32 h-32 bg-floral-pattern opacity-5 -z-10" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-floral-pattern opacity-5 -z-10 transform scale-x-[-1]" /> */}
     </motion.header>
   );
 };

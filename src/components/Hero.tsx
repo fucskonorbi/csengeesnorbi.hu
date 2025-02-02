@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import Countdown from 'react-countdown';
-import heroImage from '../assets/hero-cropped.webp';
+import heroImage from '../assets/hero-extended.jpg';
 
 const weddingDate = new Date('2025-07-04T16:00:00');
 
@@ -15,12 +15,12 @@ const Hero = () => {
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(${heroImage})`
           }}
         />
-        <div className="absolute bottom-10 left-10 text-white z-10">
+        <div className="absolute bottom-10 left-5 text-white z-10">
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="font-display text-5xl md:text-6xl mb-2"
+            className="font-display font-semibold text-5xl md:text-6xl lg:text-7xl mb-4"
           >
             Csenge & Norbi
           </motion.h1>
