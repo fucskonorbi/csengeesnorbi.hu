@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion';
 import { LocationOn, AccessTime, DirectionsCar } from '@mui/icons-material';
-import kintImage from '../assets/bejarat.png';
-import helyImage from '../assets/dron.png';
-import teremImage from '../assets/terem.jpg';
-import dekoracioImage from '../assets/dekor.png';
+import kintImage from '../assets/bejarat.webp';
+import helyImage from '../assets/dron.webp';
+import teremImage from '../assets/terem.webp';
+import dekoracioImage from '../assets/dekor.webp';
 const mapSource = `https://www.google.com/maps?q=${encodeURIComponent("Kerekerdő rendezvényház, Debrecen")}&hl=es;z=14&output=embed`;
 const Location = () => {
   return (
