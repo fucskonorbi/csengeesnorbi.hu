@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import Countdown from 'react-countdown';
-import heroImage from '../assets/hero2.jpg';
+import heroImage from '../assets/hero-cropped.webp';
 
 const weddingDate = new Date('2025-07-04T16:00:00');
 

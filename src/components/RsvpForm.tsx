@@ -172,7 +172,7 @@ const RsvpForm = () => {
   };
 
   return (
-    <div className="relative w-full bg-secondary-light/20 py-20">
+    <div className="relative w-full bg-secondary-light/20 py-20 min-h-screen">
       <div className="absolute top-0 left-0 w-64 h-64 bg-floral-pattern opacity-5 transform -rotate-12" />
       <div className="absolute bottom-0 right-0 w-64 h-64 bg-floral-pattern opacity-5 transform rotate-12" />
 

@@ -4,6 +4,7 @@ import Hero from './components/Hero';
 import Timeline from './components/Timeline';
 import Location from './components/Location';
 import RsvpForm from './components/RsvpForm';
+import UsefulInfo from './components/UsefulInfo';
 
 function App() {
   return (
@@ -26,8 +27,11 @@ function App() {
             <section id="location" className="w-full min-h-screen">
               <Location />
             </section>
-            <section id="rsvp" className="w-full">
+            <section id="rsvp" className="w-full min-h-screen">
               <RsvpForm />
+            </section>
+            <section id="useful-info" className="w-full">
+              <UsefulInfo />
             </section>
           </motion.div>
         </main>

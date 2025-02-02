@@ -6,6 +6,7 @@ const navItems = [
   { id: 'schedule', label: 'Program' },
   { id: 'location', label: 'Helyszín' },
   { id: 'rsvp', label: 'Visszajelzés' },
+  { id: 'useful-info', label: 'Elérhetőségek' },
 ];
 
 const Navigation = () => {
