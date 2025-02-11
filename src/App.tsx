@@ -27,7 +27,7 @@ function App() {
             <section id="location" className="w-full min-h-screen">
               <Location />
             </section>
-            <section id="rsvp" className="w-full min-h-screen">
+            <section id="rsvp" className="w-full">
               <RsvpForm />
             </section>
             <section id="useful-info" className="w-full">

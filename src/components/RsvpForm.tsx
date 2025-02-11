@@ -311,7 +311,7 @@ const RsvpForm = () => {
                     value={formData.guestNames}
                     onChange={(e) => handleInputChange('guestNames', e.target.value)}
                     rows={3}
-                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none"
                     placeholder="Kérlek sorold fel az érkezők teljes nevét"
                   />
                 </div>
@@ -371,7 +371,7 @@ const RsvpForm = () => {
                     value={formData.dietaryRequirements}
                     onChange={(e) => handleInputChange('dietaryRequirements', e.target.value)}
                     rows={3}
-                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none"
                     placeholder="Az érkezőknek van-e bármilyen ételallergiája és/vagy speciális étrendje?"
                   />
                 </div>
@@ -387,7 +387,7 @@ const RsvpForm = () => {
                 value={formData.message}
                 onChange={(e) => handleInputChange('message', e.target.value)}
                 rows={4}
-                className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none"
                 placeholder="Egyéb üzenet a párnak"
               />
             </div>
