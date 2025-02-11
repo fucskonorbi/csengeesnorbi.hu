@@ -27,7 +27,7 @@ const timelineItems = [
   {
     time: '20:00',
     title: 'Vacsora',
-    description: 'Húsleves és töltött káposzta, majd egy finom tál a végén! 🍽️',
+    description: 'Különböző ízletes ételek várnak! 🍽️',
     animation: dinnerAnim,
     gradient: 'from-primary-light/40 to-secondary-light/40',
     segmentEnd: 45,

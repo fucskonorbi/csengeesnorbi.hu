@@ -55,7 +55,7 @@ const Location = () => {
               </div>
               <div className="flex items-center space-x-4 text-gray-700">
                 <DirectionsCar className="w-6 h-6 text-primary" />
-                <span className="text-lg">Limitált számban parkolási lehetőség a rendezvényház előtt.</span>
+                <span className="text-lg">Parkolási lehetőség a rendezvényház előtt.</span>
               </div>
             </div>
           </motion.div>
