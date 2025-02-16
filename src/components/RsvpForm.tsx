@@ -248,7 +248,7 @@ const RsvpForm = () => {
                 onChange={(e) => handleInputChange('name', e.target.value)}
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                placeholder="Teljes név"
+                placeholder="Teljes név *"
               />
             </div>
 
@@ -263,7 +263,21 @@ const RsvpForm = () => {
                 onChange={(e) => handleInputChange('phone', e.target.value)}
                 required
                 className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
-                placeholder="Telefonszám"
+                placeholder="Telefonszám *"
+              />
+            </div>
+
+            {/* Guest Names */}
+            <div className="relative">
+              <div className="absolute top-3 left-3">
+                <Person className="h-5 w-5 text-primary" />
+              </div>
+              <textarea
+                value={formData.guestNames}
+                onChange={(e) => handleInputChange('guestNames', e.target.value)}
+                rows={3}
+                className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none"
+                placeholder="Kérlek sorold fel a további vendégek teljes nevét"
               />
             </div>
 
@@ -271,7 +285,7 @@ const RsvpForm = () => {
             <div className="space-y-3 mx-3">
               <label className="flex items-center space-x-2 text-gray-700">
                 <Celebration className="h-5 w-5 text-primary" />
-                <span className="font-medium">Részt veszel az esküvőn?*</span>
+                <span className="font-medium">Részt veszel az esküvőn? *</span>
               </label>
               <div className="grid grid-cols-2 gap-4 mt-2">
                 <button
@@ -300,27 +314,13 @@ const RsvpForm = () => {
             </div>
 
             {/* Conditional fields based on attendance */}
-            {isAttending && (
+            {isAttending !== false && (
               <>
-                {/* Guest Names */}
-                <div className="relative">
-                  <div className="absolute top-3 left-3">
-                    <Person className="h-5 w-5 text-primary" />
-                  </div>
-                  <textarea
-                    value={formData.guestNames}
-                    onChange={(e) => handleInputChange('guestNames', e.target.value)}
-                    rows={3}
-                    className="block w-full pl-10 pr-3 py-3 border border-primary-light/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none"
-                    placeholder="Kérlek sorold fel az érkezők teljes nevét"
-                  />
-                </div>
-
                 {/* Children Count */}
                 <div className="space-y-4 mx-3">
                   <label className="flex items-center space-x-2 text-gray-700">
                     <ChildCare className="h-5 w-5 text-primary" />
-                    <span>Ezek közül hányan vannak 3 és 12 év között és hányan 3 év alatt?</span>
+                    <span>A vendégek közül hányan vannak 3 és 12 év között és hányan 3 év alatt?</span>
                   </label>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
