@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import Countdown from 'react-countdown';
-import heroImage from '../assets/hero-extended.webp';
+import heroImage from '../assets/25052375.webp';
 
 const weddingDate = new Date('2025-07-04T16:00:00');
 
@@ -10,7 +10,7 @@ const Hero = () => {
       {/* Left side - Photo */}
       <div className="w-full md:w-1/2 h-screen relative">
         <div 
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-top"
           style={{
             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url(${heroImage})`
           }}
